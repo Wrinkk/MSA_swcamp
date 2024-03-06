@@ -1,5 +1,6 @@
 package com.ohgiraffers.userservice.controller;
 
+import com.ohgiraffers.userservice.client.OrderServiceClient;
 import com.ohgiraffers.userservice.dto.UserDTO;
 import com.ohgiraffers.userservice.service.UserService;
 import com.ohgiraffers.userservice.vo.HelloVO;
@@ -16,22 +17,25 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/")
 public class UserController {
 
-    private Environment env;
-    private HelloVO helloVO;
+    private final Environment env;
+    private final HelloVO helloVO;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    private UserService userService;    // UserServiceImpl을 보지않고 UserService를 봄 (타입은닉 기술)
+    private final UserService userService;    // UserServiceImpl을 보지않고 UserService를 봄 (타입은닉 기술)
+
+    private final OrderServiceClient orderServiceClient;
+
+    /* 설명. FeignClient 이후 추가 할 부분 */
 
     @Autowired
-    public UserController(Environment env, HelloVO helloVO, ModelMapper modelMapper, UserService userService) {
-
+    public UserController(Environment env, HelloVO helloVO, ModelMapper modelMapper, UserService userService, OrderServiceClient orderServiceClient) {
         this.env = env;
         this.helloVO = helloVO;
         this.modelMapper = modelMapper;
         this.userService = userService;
+        this.orderServiceClient = orderServiceClient;
     }
-
     /* 설명.
      *  application.yml 파일로부터 설정 값을 불러오기 위해서는 두 가지 방법이 제공된다.
      *  1. Environment를 의존성 주입 받아 getProperty로 설정 키 값을 작성해 불러오는 방법
@@ -56,6 +60,9 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<ResponseUser> registUser(@RequestBody RequestUser user) {
 
+        /* 설명. config server에서 제공하는 test.message값 확인 */
+        System.out.println("config server의 설정 값 확인: "
+                + env.getProperty("test.message"));
 
         /* 설명. RequestUser -> UserDTO */
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);

@@ -48,7 +48,15 @@ spring:
 #          predicates:
 #            - Path=/user-service/**
 #          filters:
-        # ?? ?? ?? ?? ???
+        # 회원 가입 이후 로드 밸런싱
+        -  id: user-service
+           uri: lb://SWCAMP-USER-SERVICE
+           predicates:
+             - Path=/user-service/actuator/***
+             - Method=POST
+           filters:
+             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
         -  id: user-service
            uri: lb://SWCAMP-USER-SERVICE
            predicates:
@@ -57,7 +65,7 @@ spring:
            filters:
              - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
-            # ?? ??? ????? ??? ???? ????? ???? ?? ??
+             # 현재 상황의 라우팅에서 토큰을 들고와서 요청하는지 판단하기 위한 필터
              - AuthorizationHeaderFilter
         -  id: user-service
            uri: lb://SWCAMP-USER-SERVICE
@@ -74,5 +82,14 @@ spring:
              - Method=POST
            filters:
              - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        # 주문 관련 도메인(마이크로 서비스) 서버 추가 후
+        -  id: order-service
+           uri: lb://SWCAMP-ORDER-SERVICE
+           predicates:
+             - Path=/order-service/**
+           filters:
+             - RewritePath=/order-service/(?<segment>.*), /$\{segment}
+
 token:
   secret: l1Z5I9WufSD5qM0UTHXDJa1kaGxBlyhKMbx+ONkqzeRTlKdF8Bq37mA3Z8nhjRlwVUrL/u3bdkFeamIrUoWvVw==

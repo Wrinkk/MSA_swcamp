@@ -27,6 +27,7 @@ ext {
 
 dependencies {
 
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
@@ -47,6 +48,16 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // feignclient 추가 시 넣을 dependency(main()  있는 클래스에 애노테이션 추가)
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // config 서버 활용 시 추가할 내용(JWT Token 값 관련 설정 서버 활용)
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
+
+    // config 서버 추가 후 config 서버 refreshf르 위해 추가한 dependency
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 dependencyManagement {

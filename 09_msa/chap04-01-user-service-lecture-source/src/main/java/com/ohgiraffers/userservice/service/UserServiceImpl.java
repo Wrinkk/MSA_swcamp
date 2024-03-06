@@ -1,8 +1,10 @@
 package com.ohgiraffers.userservice.service;
 
 import com.ohgiraffers.userservice.aggregate.UserEntity;
+import com.ohgiraffers.userservice.client.OrderServiceClient;
 import com.ohgiraffers.userservice.dto.UserDTO;
 import com.ohgiraffers.userservice.repository.UserRepository;
+import com.ohgiraffers.userservice.vo.ResponseOrder;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,13 +25,14 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private ModelMapper modelMapper;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final OrderServiceClient orderServiceClient;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository,
-                           ModelMapper modelMapper, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, BCryptPasswordEncoder bCryptPasswordEncoder, OrderServiceClient orderServiceClient) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.orderServiceClient = orderServiceClient;
     }
 
     @Transactional
@@ -85,6 +89,12 @@ public class UserServiceImpl implements UserService {
                     return new UsernameNotFoundException("조회된 회원 없음");
                 });
         UserDTO userDTO = modelMapper.map(userEntity, UserDTO.class);
+// 통신은 서비스계층에서 하는것임(컨트롤러 X)
+
+
+        /* 설명. FeignClient를 통한 통신 시 추가할 부분 */
+        List<ResponseOrder> orderList = orderServiceClient.getUserOrders(id);
+
 
         return userDTO;
 
